@@ -12,6 +12,22 @@ var CLIENT_ID = require("../config/config").CLIENT_ID;
 
 const client = new OAuth2Client(CLIENT_ID);
 
+var mdAutenticacion = require("../middlewares/autenticacion");
+//===================================================
+// Autenticacion de google
+//===================================================
+
+app.get("/renuevatoken", mdAutenticacion.verificaToken, (req, res) => {
+
+  var token = jwt.sign({ usuario: req.usuario }, SEED, { expiresIn: 14400 }); // 4hrs expira
+
+  res.status(200).json({
+    ok: true,
+    token: token
+  });
+
+});
+
 //===================================================
 // Autenticacion de google
 //===================================================
@@ -108,7 +124,6 @@ app.post("/google", async (req, res) => {
           token: token,
           id: usuarioDB.id,
           menu: obtenerMenu(usuarioDB.role)
-
         });
       });
     }
@@ -163,7 +178,6 @@ app.post("/", (req, res) => {
       token: token,
       id: usuarioDB.id,
       menu: obtenerMenu(usuarioDB.role)
-
     });
   });
 });
@@ -196,7 +210,6 @@ function obtenerMenu(ROLE) {
   if (ROLE === "ADMIN_ROLE") {
     menu[1].submenu.unshift({ titulo: "Usuarios", url: "/usuarios" });
   } else {
-
   }
 
   return menu;
